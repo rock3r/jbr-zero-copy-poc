@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003, 2025, Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2026 JetBrains s.r.o.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,18 +23,31 @@
  * questions.
  */
 
-#ifndef WINDOWSFLAGS_H
-#define WINDOWSFLAGS_H
+package sun.java2d.d3d;
 
-extern BOOL      useD3D;             // d3d enabled flag
-extern BOOL      forceD3DUsage;      // force d3d on or off
-extern BOOL      useD3D9Ex;          // create the d3d device via Direct3D 9Ex
-extern BOOL      setHighDPIAware;    // whether to set High DPI Aware flag on Vista
+/**
+ * Native extensions used by the SharedTextures interop
+ * (see {@code com.jetbrains.desktop.SharedTexturesService}).
+ * All methods must be invoked on the render queue flusher thread.
+ */
+public class D3DSurfaceDataExt {
+    /**
+     * Wraps a shared Direct3D 11 texture (created with
+     * {@code D3D11_RESOURCE_MISC_SHARED}) by opening its legacy shared
+     * handle on the Java2D Direct3D 9Ex device.
+     *
+     * @param sd the surface data whose native resource is initialized
+     * @param pD3D11Texture pointer to the producer's {@code ID3D11Texture2D}
+     */
+    public static boolean initWithSharedTexture(D3DSurfaceData sd, long pD3D11Texture) {
+        return initWithSharedTexture(sd.getNativeOps(), pD3D11Texture);
+    }
 
-void SetD3DEnabledFlag(JNIEnv *env, BOOL d3dEnabled, BOOL d3dSet);
+    private static native boolean initWithSharedTexture(long pData, long pD3D11Texture);
 
-BOOL IsD3DEnabled();
-BOOL IsD3DForced();
-BOOL IsD3D9ExEnabled();
-
-#endif // WINDOWSFLAGS_H
+    /**
+     * Whether the Direct3D pipeline runs on a Direct3D 9Ex device
+     * (required for opening shared handles).
+     */
+    public static native boolean isD3D9ExDevice();
+}
