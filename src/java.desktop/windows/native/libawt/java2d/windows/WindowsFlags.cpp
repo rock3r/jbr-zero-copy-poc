@@ -30,6 +30,7 @@
 BOOL      useD3D = TRUE;      // d3d enabled flag
                               // initially is TRUE to allow D3D preloading
 BOOL      forceD3DUsage;      // force d3d on or off
+BOOL      useD3D9Ex = FALSE;  // create the d3d device via Direct3D 9Ex
 BOOL      setHighDPIAware;    // Whether to set the high-DPI awareness flag
 
 extern WCHAR *j2dAccelKey;       // Name of java2d root key
@@ -88,6 +89,7 @@ void GetFlagValues(JNIEnv *env, jclass wFlagsClass)
     }
     useD3D = d3dEnabled;
     forceD3DUsage = d3dSet;
+    useD3D9Ex = GetStaticBoolean(env, wFlagsClass, "d3d9ExEnabled");
     setHighDPIAware =
         (IS_WINVISTA && GetStaticBoolean(env, wFlagsClass, "setHighDPIAware"));
     JNU_CHECK_EXCEPTION(env);
@@ -120,6 +122,10 @@ BOOL IsD3DEnabled() {
 
 BOOL IsD3DForced() {
     return forceD3DUsage;
+}
+
+BOOL IsD3D9ExEnabled() {
+    return useD3D9Ex;
 }
 
 extern "C" {
